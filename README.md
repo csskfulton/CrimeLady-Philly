@@ -110,26 +110,26 @@ An Alexa App & API, updating users of local district news such as, missing perso
 
 ## Sample Utterances
 
-  ackResponse {answer}
+  Crime lady {answer}
   
-  districtNews {command} the {newsType} news for the {districtNums} district
+  Crime lady {command} the {newsType} news for the {districtNums} district
   
-  districtNews {navigation}
+  Crime lady {navigation}
   
-  districtNews {command} the {newsType} news
+  Crime lady {command} the {newsType} news
   
-  fetchStats how many {crimeType} happen in the {district} district {presentTime}
+  Crime lady how many {crimeType} happen in the {district} district {presentTime}
   
-  fetchStats how many {crimeType} happen {presentTime}
+  Crime lady how many {crimeType} happen {presentTime}
   
-  fetchStats how many {crimeType} happened {presentTime} ago
+  Crime lady how many {crimeType} happened {presentTime} ago
   
-  fetchStats where there any {crimeType} in the {district} district {presentTime}
+  Crime lady where there any {crimeType} in the {district} district {presentTime}
   
-  fetchStats where there any {crimeType} {presentTime}
+  Crime lady where there any {crimeType} {presentTime}
   
-  fetchStats where there any {crimeType} {timePeriod} {presentTime} ago
+  Crime lady where there any {crimeType} {timePeriod} {presentTime} ago
   
-  fetchStats where there any {crimeType} this {presentTime}
+  Crime lady where there any {crimeType} this {presentTime}
   
-  fetchStats how many {crimeType} happened in the {district} district {timePeriod} {presentTime} ago
+  Crime lady how many {crimeType} happened in the {district} district {timePeriod} {presentTime} ago
