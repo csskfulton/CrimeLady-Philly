@@ -1,0 +1,582 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "crime lady",
+            "intents": [
+                {
+                    "name": "ackResponse",
+                    "slots": [
+                        {
+                            "name": "answer",
+                            "type": "yesNo"
+                        }
+                    ],
+                    "samples": [
+                        "{answer}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "districtNews",
+                    "slots": [
+                        {
+                            "name": "districtNums",
+                            "type": "districtNames"
+                        },
+                        {
+                            "name": "newsType",
+                            "type": "NewsNames"
+                        },
+                        {
+                            "name": "navigation",
+                            "type": "navy_names"
+                        },
+                        {
+                            "name": "command",
+                            "type": "commandNames"
+                        }
+                    ],
+                    "samples": [
+                        "{districtNums} district {newsType} news",
+                        "{command} the {newsType} news for the {districtNums} district",
+                        "{navigation}",
+                        "{command} the {newsType} news"
+                    ]
+                },
+                {
+                    "name": "fetchStats",
+                    "slots": [
+                        {
+                            "name": "presentTime",
+                            "type": "timeName"
+                        },
+                        {
+                            "name": "countVal",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "district",
+                            "type": "districtNames"
+                        },
+                        {
+                            "name": "crimeType",
+                            "type": "crimeTypes"
+                        },
+                        {
+                            "name": "timePeriod",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "{crimeType} {district} district",
+                        "how many {crimeType} happen in the {district} district {presentTime}",
+                        "how many {crimeType} happen {presentTime}",
+                        "where there any {crimeType} in the {district} district {presentTime}",
+                        "where there any {crimeType} {presentTime}",
+                        "where there any {crimeType} {timePeriod} {presentTime} ago",
+                        "where there any {crimeType} this {presentTime}",
+                        "how many {crimeType} happened in the {district} district {timePeriod} {presentTime} ago"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                }
+            ],
+            "types": [
+                {
+                    "name": "commandNames",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "tell me"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "read me"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "fetch me"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "who got"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "how many"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "crimeTypes",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "robbery",
+                                "synonyms": [
+                                    "rob",
+                                    "robbed",
+                                    "robberies"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "assault",
+                                "synonyms": [
+                                    "assaults"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "missing person",
+                                "synonyms": [
+                                    "people missing",
+                                    "missing persons",
+                                    "missing people"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "sexual assault",
+                                "synonyms": [
+                                    "rapes",
+                                    "raped",
+                                    "sex assault",
+                                    "rape",
+                                    "sex crimes",
+                                    "sex assaults"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "theft",
+                                "synonyms": [
+                                    "thieves",
+                                    "thefts"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "burglary",
+                                "synonyms": [
+                                    "burglar"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "shootings",
+                                "synonyms": [
+                                    "shot",
+                                    "shots"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "homicide",
+                                "synonyms": [
+                                    "killed"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "drugs",
+                                "synonyms": [
+                                    "narcotics",
+                                    "selling drugs"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "districtNames",
+                    "values": [
+                        {
+                            "id": "1",
+                            "name": {
+                                "value": "1",
+                                "synonyms": [
+                                    "1st",
+                                    "first"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "2",
+                            "name": {
+                                "value": "2",
+                                "synonyms": [
+                                    "2nd",
+                                    "second"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "3",
+                            "name": {
+                                "value": "3",
+                                "synonyms": [
+                                    "3rd",
+                                    "third"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "5",
+                            "name": {
+                                "value": "5",
+                                "synonyms": [
+                                    "fifth",
+                                    "5th"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "6",
+                            "name": {
+                                "value": "6",
+                                "synonyms": [
+                                    "6th",
+                                    "sixth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "7",
+                            "name": {
+                                "value": "7",
+                                "synonyms": [
+                                    "7th",
+                                    "seventh"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "8",
+                            "name": {
+                                "value": "8",
+                                "synonyms": [
+                                    "8th",
+                                    "eighth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "9",
+                            "name": {
+                                "value": "9",
+                                "synonyms": [
+                                    "9th",
+                                    "ninth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "12",
+                            "name": {
+                                "value": "12",
+                                "synonyms": [
+                                    "12th",
+                                    "twelfth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "14",
+                            "name": {
+                                "value": "14",
+                                "synonyms": [
+                                    "14th",
+                                    "fourteenth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "15",
+                            "name": {
+                                "value": "15",
+                                "synonyms": [
+                                    "15th",
+                                    "fifthteenth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "16",
+                            "name": {
+                                "value": "16",
+                                "synonyms": [
+                                    "16th",
+                                    "sixteenth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "17",
+                            "name": {
+                                "value": "17",
+                                "synonyms": [
+                                    "17th",
+                                    "seventeenth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "18",
+                            "name": {
+                                "value": "18",
+                                "synonyms": [
+                                    "18th",
+                                    "eighteenth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "19",
+                            "name": {
+                                "value": "19",
+                                "synonyms": [
+                                    "19th",
+                                    "nineteenth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "22",
+                            "name": {
+                                "value": "22",
+                                "synonyms": [
+                                    "22nd",
+                                    "twenty second",
+                                    "twenty secondth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "24",
+                            "name": {
+                                "value": "24",
+                                "synonyms": [
+                                    "24th",
+                                    "twenty four",
+                                    "twenty fourth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "25",
+                            "name": {
+                                "value": "25",
+                                "synonyms": [
+                                    "25th",
+                                    "twenty fifth"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "26",
+                            "name": {
+                                "value": "26",
+                                "synonyms": [
+                                    "26th",
+                                    "twenty sixth",
+                                    "twenty six"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "35",
+                            "name": {
+                                "value": "35",
+                                "synonyms": [
+                                    "35th",
+                                    "thirty fifth"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "39"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "navy_names",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "next",
+                                "synonyms": [
+                                    "skip",
+                                    "read on",
+                                    "keep going"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "continue",
+                                "synonyms": [
+                                    "go"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "repeat",
+                                "synonyms": [
+                                    "start over",
+                                    "what happen",
+                                    "say that again",
+                                    "read that again"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "NewsNames",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "latest",
+                                "synonyms": [
+                                    "recent",
+                                    "most recent"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "all"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "crime"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "district"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "shortTime",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "latest"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "timeName",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "yesterday"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "today"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "week"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "weeks"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "months"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "month"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "year"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "years"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "days"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "yesNo",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "yes",
+                                "synonyms": [
+                                    "for sure",
+                                    "definitely",
+                                    "absolutely",
+                                    "of course",
+                                    "why not",
+                                    "please",
+                                    "yeah",
+                                    "yea",
+                                    "sure"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "no"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
