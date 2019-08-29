@@ -45,9 +45,15 @@
                         {
                             "name": "command",
                             "type": "commandNames"
+                        },
+                        {
+                            "name": "presentTime",
+                            "type": "timeName"
                         }
                     ],
                     "samples": [
+                        "{command} the {newsType} {districtNums} district news",
+                        "{command} the news from {presentTime}",
                         "{districtNums} district {newsType} news",
                         "{command} the {newsType} news for the {districtNums} district",
                         "{navigation}",
@@ -60,10 +66,6 @@
                         {
                             "name": "presentTime",
                             "type": "timeName"
-                        },
-                        {
-                            "name": "countVal",
-                            "type": "AMAZON.NUMBER"
                         },
                         {
                             "name": "district",
@@ -79,6 +81,7 @@
                         }
                     ],
                     "samples": [
+                        "tell me about the {presentTime} {crimeType} in the {district} district",
                         "{crimeType} {district} district",
                         "how many {crimeType} happen in the {district} district {presentTime}",
                         "how many {crimeType} happen {presentTime}",
@@ -98,6 +101,11 @@
                 {
                     "name": "commandNames",
                     "values": [
+                        {
+                            "name": {
+                                "value": "what is"
+                            }
+                        },
                         {
                             "name": {
                                 "value": "tell me"
@@ -190,6 +198,7 @@
                             "name": {
                                 "value": "shootings",
                                 "synonyms": [
+                                    "shooting",
                                     "shot",
                                     "shots"
                                 ]
@@ -503,6 +512,17 @@
                 {
                     "name": "timeName",
                     "values": [
+                        {
+                            "name": {
+                                "value": "last",
+                                "synonyms": [
+                                    "most recent",
+                                    "recent",
+                                    "lastest",
+                                    "recently"
+                                ]
+                            }
+                        },
                         {
                             "name": {
                                 "value": "yesterday"
