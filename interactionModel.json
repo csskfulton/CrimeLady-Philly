@@ -138,6 +138,16 @@
                     "values": [
                         {
                             "name": {
+                                "value": "rape",
+                                "synonyms": [
+                                    "rapes",
+                                    "raped",
+                                    "rapings"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
                                 "value": "robbery",
                                 "synonyms": [
                                     "rob",
@@ -168,10 +178,7 @@
                             "name": {
                                 "value": "sexual assault",
                                 "synonyms": [
-                                    "rapes",
-                                    "raped",
                                     "sex assault",
-                                    "rape",
                                     "sex crimes",
                                     "sex assaults"
                                 ]
@@ -190,6 +197,7 @@
                             "name": {
                                 "value": "burglary",
                                 "synonyms": [
+                                    "burglaries",
                                     "burglar"
                                 ]
                             }
@@ -216,6 +224,16 @@
                             "name": {
                                 "value": "drugs",
                                 "synonyms": [
+                                    "drug incidents",
+                                    "drug violations",
+                                    "narcotic violations",
+                                    "narcotic violation",
+                                    "drug violation",
+                                    "drug crimes",
+                                    "drug crime",
+                                    "drug incident",
+                                    "drug",
+                                    "drug arrest",
                                     "narcotics",
                                     "selling drugs"
                                 ]
@@ -443,6 +461,11 @@
                             "name": {
                                 "value": "next",
                                 "synonyms": [
+                                    "move on",
+                                    "keep on reading",
+                                    "go on",
+                                    "keep reading",
+                                    "continue",
                                     "skip",
                                     "read on",
                                     "keep going"
@@ -451,16 +474,9 @@
                         },
                         {
                             "name": {
-                                "value": "continue",
-                                "synonyms": [
-                                    "go"
-                                ]
-                            }
-                        },
-                        {
-                            "name": {
                                 "value": "repeat",
                                 "synonyms": [
+                                    "one more time",
                                     "start over",
                                     "what happen",
                                     "say that again",
@@ -516,9 +532,9 @@
                             "name": {
                                 "value": "last",
                                 "synonyms": [
+                                    "latest",
                                     "most recent",
                                     "recent",
-                                    "lastest",
                                     "recently"
                                 ]
                             }
