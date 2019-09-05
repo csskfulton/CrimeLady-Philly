@@ -21,6 +21,20 @@ class CrimeObject{
     var $LocationY;
     
     
+    function noMoreCrimes(){
+        
+        $txt = '<speak>did you not hear me say, <p>there are no more crimes left to read!</p> Are you hard of hearing?</speak>';
+        
+        $say = array("version"=>"1.0","sessionAttributes"=>"",
+            "response"=>array("outputSpeech"=>array("type"=>"SSML","ssml"=>$txt),
+                "reprompt"=>null,"shouldEndSession"=>false));
+        
+        return json_encode($say);
+        
+        
+    }
+    
+    
     function getMoreCrimes($districtNum,$dDate,$category,$totalCount,$currentCount,$presentTime,$crimeType,$readCount){
         
         $connect = new ConnectObject();
@@ -58,7 +72,7 @@ class CrimeObject{
             
             $free = "<p>".$wDis."on ".$tiime." the Philadelphia Police were dispatched at ".$d_time.", to the ".$bllk." for a ".$crime.$noMore."</p>";
             
-            $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("totalCount"=>$totalCount,"currentCount"=>$currentCount,"dDate"=>null,"category"=>null,"districtNumber"=>$districtNum,"presentTime"=>null,"crimeType"=>null,"readCount"=>""),"response"=>
+            $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("totalCount"=>$totalCount,"currentCount"=>$currentCount,"dDate"=>$dDate,"category"=>$category,"districtNumber"=>$districtNum,"presentTime"=>$presentTime,"crimeType"=>$crimeType,"readCount"=>""),"response"=>
                 array("outputSpeech"=>
                     array("type"=>"SSML","ssml"=>"<speak>".$free."</speak>"),"shouldEndSession"=>false,"reprompt"=>null)));
             
@@ -88,6 +102,10 @@ class CrimeObject{
         
         
     }
+    
+    
+  
+    
     
     
     function getCrimeToday($crimeValue, $districtNumber){

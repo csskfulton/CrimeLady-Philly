@@ -22,7 +22,21 @@
         
 
         
-        function getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,$hash){
+        function noMoreNewsStories(){
+
+            $txt = '<speak>did you not hear me say, <p>there are no more stories left to read!</p> Are you hard of hearing?</speak>';
+            
+            $say = array("version"=>"1.0","sessionAttributes"=>"",
+                "response"=>array("outputSpeech"=>array("type"=>"SSML","ssml"=>$txt),
+                    "reprompt"=>null,"shouldEndSession"=>false));
+            
+            return json_encode($say);
+            
+            
+        }
+        
+        
+        function getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,$hash,$pubDate){
             
             $ress = '';
             $speaK = '';
@@ -35,10 +49,29 @@
             $totalCount --;
             
             if($districtNumber == 0){
-                $us_ql = "SELECT * FROM `NewsStory` WHERE `ScrapeHash` = '$hash' ORDER BY `PubDate` DESC LIMIT $totalCount,$currentCount";
+                $utils->writetoLog("DISTRICT  = 00");
+                
+                if($hash == 0){
+                    $utils->writetoLog("NO HASH HERE");
+                    $us_ql = "SELECT * FROM `NewsStory` WHERE `PubDate` LIKE '%$pubDate%' ORDER BY `PubDate` DESC LIMIT $totalCount,$currentCount";
+                    
+                }else{
+                    $utils->writetoLog("GOT THAT HASH");
+                    $us_ql = "SELECT * FROM `NewsStory` WHERE `ScrapeHash` = '$hash' ORDER BY `PubDate` DESC LIMIT $totalCount,$currentCount";
+                    
+                }
+                
                 
             }else{
-                $us_ql = "SELECT * FROM `NewsStory` WHERE `ScrapeHash` = '$hash' AND `DistrictNumber` = $districtNumber ORDER BY `PubDate` DESC LIMIT $totalCount,$currentCount";
+                
+                $utils->writetoLog("GOT A DISTRICT HERE");
+                if($hash == 0){
+                    $utils->writetoLog("NO HASH HERE ");
+                }else{
+                    $utils->writetoLog("DA HASH IS HERE ");
+                    $us_ql = "SELECT * FROM `NewsStory` WHERE `ScrapeHash` = '$hash' AND `DistrictNumber` = $districtNumber ORDER BY `PubDate` DESC LIMIT $totalCount,$currentCount";
+                    
+                }
                 
             }
             
@@ -52,18 +85,19 @@
             $kepg = " <p>would you like me to read the next story?</p>";
             $ending2 = "<p> ,there are no more stories to report, would you like me to help you with something else?</p>";
             
+            
             $desc = utf8_encode($utils->cleanTxT($roe['Description']));
             //$desc = utf8_encode($roe['Description']);
             $speaK = '<p>'.$desc.'</p>';
             
-            $utils->writetoLog($speaK);
+            $utils->writetoLog("ABOTU TO SAY @@".$speaK);
             
             $readCount ++;
             
             if($totalCount == 0){
                 $spea = $newsNum.$speaK.$ending2;
                 
-                $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("totalCount"=>$totalCount,"currentCount"=>1,"Hash"=>$hash,"readCount"=>$readCount),"response"=>
+                $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("districtNews"=>true,"totalCount"=>$totalCount,"currentCount"=>1,"Hash"=>$hash,"readCount"=>$readCount),"response"=>
                     array("outputSpeech"=>
                         array("type"=>"SSML","ssml"=>"<speak>".$spea."</speak>"),"shouldEndSession"=>false,"reprompt"=>null)));
                 
@@ -71,7 +105,7 @@
             }else{
                 $spea = $newsNum.$speaK.$kepg;
                 
-                $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("totalCount"=>$totalCount,"currentCount"=>1,"Hash"=>$hash,"readCount"=>$readCount),"response"=>
+                $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("districtNews"=>true,"totalCount"=>$totalCount,"currentCount"=>1,"Hash"=>$hash,"readCount"=>$readCount,"pubDate"=>$pubDate),"response"=>
                     array("outputSpeech"=>
                         array("type"=>"SSML","ssml"=>"<speak>".$spea."</speak>"),"shouldEndSession"=>false,"reprompt"=>null)));
                 
@@ -81,12 +115,200 @@
             
             
             
-            $utils->writetoLog($ress);
+            $utils->writetoLog("PASSING THIS  ".$ress);
             
             return $ress;
             
             
         }
+        
+  
+        
+        
+        function getYesterdayNews($districtNumber){
+            
+            $connect = new ConnectObject();
+            $utils = new ParserHelper();
+            date_default_timezone_set('US/Eastern');
+            $say = '';
+            $totalCount = '';
+            $pubDate = '';
+                
+                $utils->writeToLog("YESTERDAY NO DISTRICT");
+                $tDate = date('Y-m-d');
+                $pubDate = date('Y-m-d', (strtotime ('-1 day', strtotime($tDate))));
+                
+                if($districtNumber == 0){
+                   
+                    $sel = "SELECT COUNT(`PubDate`) AS COUNT FROM `NewsStory` WHERE `PubDate` LIKE '%$pubDate%'";
+                    
+                }else{
+                    
+                    $sel = "SELECT COUNT(`PubDate`) AS COUNT FROM `NewsStory` WHERE `PubDate` LIKE '%$pubDate%' AND `DistrictNumber` = '$districtNumber'";
+                    
+                }
+                
+                $res = mysqli_query($connect->connect(),$sel);
+                $utils->writeToLog("RAN THIS QUERY: ".$sel);
+                
+                if($res){ 
+                    
+                    $arr = mysqli_fetch_array($res);
+                    $totalCount = $arr['COUNT'];
+                    $utils->writeToLog("DA COUNT111 ".$totalCount);
+                    
+                    if($totalCount == 0){ // NO NEWS STORY YESTERDAY
+                        
+                        if($districtNumber == 0){
+                            
+                            $sel1 = "SELECT `PubDate` FROM `NewsStory` WHERE `PubDate` < '$pubDate' ORDER BY `PubDate` DESC LIMIT 0,1";
+                            
+                        }else{
+                            
+                            $sel1 = "SELECT `PubDate` FROM `NewsStory` WHERE `PubDate` < '$pubDate' AND `DistrictNumber` = '$districtNumber' ORDER BY `PubDate` DESC LIMIT 0,1";
+                            
+                        }
+                        
+                            $res1 = mysqli_query($connect->connect(), $sel1);
+                            $utils->writeToLog("RAN THIS QUERY: ".$sel1);
+                            
+                            if($res1){
+                                
+                                $arr1 = mysqli_fetch_array($res1);
+                               // $hash = $arr1['ScrapeHash'];
+                                $h9 = explode(" ",$arr1['PubDate']);
+                                $pubDate = $h9[0];
+                                $utils->writeToLog("DA DATE RETURNED-  ".$pubDate);
+                                if($districtNumber == 0){
+                                    
+                                    $sel3 = "SELECT COUNT(`PubDate`) AS COUNT FROM `NewsStory` WHERE `PubDate` LIKE '%$pubDate'%";
+                                    
+                                }else{
+                                    
+                                    $sel3 = "SELECT COUNT(`PubDate`) AS COUNT FROM `NewsStory` WHERE `PubDate` LIKE '%$pubDate%' AND `DistrictNumber` = '$districtNumber'";
+                                    
+                                }
+                                
+                                $res3 = mysqli_query($connect->connect(), $sel3);
+                                $utils->writeToLog("RAN THIS QUERY 333: ".$sel3);
+                                
+                                    if($res3){
+                                        
+                                        $arr3 = mysqli_fetch_array($res3);
+                                        $totalCount = $arr3['COUNT'];
+                                        $utils->writeToLog("RAN THIS QUERY 333: ".$totalCount);
+                                        
+                                        $now = date('Y-m-d');
+                                        $then = date('Y-m-d', strtotime($pubDate));
+                                        $lName = date('l F jS,', strtotime($then));
+                                        
+                                        $x_ago = $utils->dateDifference($now, $then, "%d days");
+                                        
+                                        
+                                        
+                                        $utils->writeToLog("AGO ".$x_ago);
+                                        
+                                        if($x_ago == "0 days"){
+                                            $x_ago = "today, ".$lName;
+                                        }
+                                        else if($x_ago == "1 days"){
+                                            $x_ago = "yesterday, ".$lName;
+                                        }
+                                        else{
+                                            $x_ago = $x_ago." ago, ".$lName;
+                                            
+                                        }
+                                        
+                                        if($totalCount == 1){
+                                            
+                                            if($districtNumber == 0){
+                                                $say = '<p>There were no reported news stories yesterday, however</p> <s>there is one news story '.$x_ago.' would you like me to read this story?</s>';
+                                                
+                                            }else{
+                                                $say = '<p>There were no reported news stories in the '.$utils->addTH($districtNumber).' district yesterday, however</p> <s>there is one news story '.$x_ago.' would you like me to read this story?</s>';
+                                                
+                                            }
+                                            
+                                           
+                                        }else{
+                                         // MORE THEN ONE NEWS STORY  
+                                            if($districtNumber == 0){
+                                                $say = '<p>There were no reported news stories yesterday, however</p> <s>there are '.$totalCount.' news stories '.$x_ago.' would you like me to read this story?</s>';
+                                                
+                                            }else{
+                                                
+                                                $say = '<p>There were no reported news stories in the '.$utils->addTH($districtNumber).' district yesterday, however</p> <s>there are '.$totalCount.' news stories '.$x_ago.' would you like me to read this story?</s>';
+                                                
+                                            }
+                                         
+                                            
+                                        }
+                                        
+                                        
+                                        
+                                    }
+                                
+                                
+                            }
+                            
+                        }else{
+                            /// THERE IS A YESTERDAY STORY
+
+                            $utils->writeToLog("RAN THIS QUERY 999: ");
+                            $lName = date('l F jS,', strtotime($pubDate));
+                            
+                            if($totalCount == 1){
+                                if($districtNumber == 0){
+                                    $say = 'There is one reported news story yesterday, '.$lName.' would you like me to read this story?';
+                                    
+                                }else{
+                                    $say = 'There is one reported news story in the '.$utils->addTH($districtNumber).' district yesterday, '.$lName.' would you like me to read this story?';
+                                    
+                                }
+                               
+                            }else{
+                                // MORE THEN ONE NEWS STORY
+                                if($districtNumber == 0){
+                                    
+                                    $say = 'There were '.$totalCount.' reported news stories yesterday, '.$lName.' would you like me to read these news stories?';
+                                    
+                                }else{
+                                    
+                                    $say = 'There were '.$totalCount.' reported news stories in the '.$utils->addTH($districtNumber).' district yesterday, '.$lName.' would you like me to read these news stories?';
+                                    
+                                }
+                                
+                                
+                            }
+                            
+                        }
+                    
+                    
+                    
+                    
+                }else{
+                    
+                    /// FIRST QUERY FAILED TO GET COUNT
+                    
+                    
+                }
+                
+                
+                $ress = json_encode(array("version"=>"1.0","sessionAttributes"=>array("districtNews"=>true,"pubDate"=>$pubDate,"districtNumber"=>0,"totalCount"=>$totalCount,"currentCount"=>1,"readCount"=>1),"response"=>
+                    array("outputSpeech"=>
+                        array("type"=>"SSML","ssml"=>"<speak>".$say."</speak>"),"shouldEndSession"=>false,"reprompt"=>null)));
+                
+                return $ress;
+                
+                
+            
+            
+            
+            
+        }
+        
+        
+        
         
         
         function getLastDistrictNews($isDisA){

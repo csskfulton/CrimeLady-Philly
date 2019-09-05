@@ -27,6 +27,7 @@
         var $isFatal;
     
         function getAPI_Info($d_url){
+            
             $utils = new ParserHelper();
             $curl = curl_init($d_url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -37,6 +38,35 @@
             curl_close($curl);
             
             return json_decode($curl_response, true);
+            
+        }
+        
+        
+        function getLastShooting($districtNumber){
+            
+            date_default_timezone_set('US/Eastern');
+            $utils = new ParserHelper();
+            
+            if($districtNumber !== 0){
+                
+                $URL = 'https://phl.carto.com/api/v2/sql?q=SELECT%20%2A%20FROM%20shootings%20WHERE%20dist%20%3D%20%27'.$districtNumber.'%27%20ORDER%20BY%20date_%20DESC%20NULLS%20LAST%20LIMIT%201';
+                $data_array = ShootingObject::getAPI_Info($URL);
+                $txt = $utils->fetchShootArray($data_array['rows']);
+                $utils->writeToLog("URL DDD ".$URL);
+            }else{
+                
+                $URL = 'https://phl.carto.com/api/v2/sql?q=SELECT%20%2A%20FROM%20shootings%20ORDER%20BY%20date_%20DESC%20NULLS%20LAST%20LIMIT%201';
+                $data_array = ShootingObject::getAPI_Info($URL);
+                $txt = $utils->fetchShootArray($data_array['rows']);
+                $utils->writeToLog("URL1 ".$URL);
+            }
+            
+            $say = array("version"=>"1.0","sessionAttributes"=>"",
+                "response"=>array("outputSpeech"=>array("type"=>"SSML","ssml"=>$txt),
+                    "reprompt"=>null,"shouldEndSession"=>false));
+                
+            return json_encode($say);
+            
             
         }
         
@@ -74,6 +104,146 @@
             
             
             
+            
+            
+            
+        }
+        
+        
+        function getYesterdayShooting($districtNumber){
+            
+            date_default_timezone_set('US/Eastern');
+            $utils = new ParserHelper();
+            $tDate = date('Y-m-d');
+            $pubDate = date('Y-m-d', (strtotime ('-1 day', strtotime($tDate))));
+            $utils->writeToLog("DATE ".$pubDate);
+                
+                if($districtNumber == 0){
+                    
+                    $URL = 'https://phl.carto.com/api/v2/sql?q=SELECT%20COUNT%28date_%29%20FROM%20shootings%20WHERE%20date_%3A%3Atext%20LIKE%20%27'.$pubDate.'%27';
+                    
+                }else{
+                    
+                    $URL = 'https://phl.carto.com/api/v2/sql?q=SELECT%20COUNT%28date_%29%20FROM%20shootings%20WHERE%20dist%20%3D%20%27'.$districtNumber.'%27%20AND%20date_%3A%3Atext%20LIKE%20%27'.$pubDate.'%27';
+                    
+                }
+                
+            $utils->writeToLog("GOING TO ".$URL);
+            
+            $data_array = ShootingObject::getAPI_Info($URL);
+            $totalCount = $data_array['rows'][0]['count'];
+            $daa = date('l F jS', strtotime($pubDate));
+            
+            
+            if($totalCount == 0){
+                // NO SHOOTING YESTERDAY
+                
+                if($districtNumber == 0){
+                    $URL1 = 'https://phl.carto.com/api/v2/sql?q=SELECT%20date_%20FROM%20shootings%20ORDER%20%20BY%20date_%20DESC%20NULLS%20LAST%20LIMIT%20%201';
+                    
+                }else{
+                    
+                    $URL1 = 'https://phl.carto.com/api/v2/sql?q=SELECT%20date_%20FROM%20shootings%20WHERE%20dist%20%3D%20%27'.$districtNumber.'%27%20ORDER%20%20BY%20date_%20DESC%20NULLS%20LAST%20LIMIT%20%201';
+                    
+                }
+                
+                $data_array1 = ShootingObject::getAPI_Info($URL1);
+                $utils->writeToLog("WENT HERE ".$URL1);
+                $xDate = $data_array1['rows'][0]['date_'];
+                $ex1 = explode("T", $xDate);
+                $pubDate = $ex1[0];
+                $utils->writeToLog("WORKING DATE ".$pubDate);
+                $x_ago = $utils->dateDifference($pubDate, $tDate,"%d days");
+                $old_date = date($pubDate);
+                $old_date_timestamp = strtotime($old_date);
+                $daa = date('l F jS', $old_date_timestamp);
+                
+                if($x_ago == "0 days"){
+                    $x_ago = "today,";
+                }
+                else if($x_ago == "1 days"){
+                    $x_ago = "yesterday";
+                }
+                else{
+                    $x_ago = $x_ago." ago,";
+                    
+                }
+          
+                if($districtNumber == 0){
+                    $utils->writeToLog("DISTRICT NO");
+                    
+                    $URL2 = 'https://phl.carto.com/api/v2/sql?q=SELECT%20COUNT%28date_%29%20FROM%20shootings%20WHERE%20date_%3A%3Atext%20LIKE%20%27'.$pubDate.'%27';
+                    $utils->writeToLog("GOINT TO ".$URL2);
+                    $data_array2 = ShootingObject::getAPI_Info($URL2);
+                    $totalCount = $data_array2['rows'][0]['count'];
+                    
+                    
+                    if($totalCount == 1){
+                        $utils->writeToLog("Tcount = 1 ");
+                        $say = 'There are no reported shootings yesterday however, there is one reported shooting '.$x_ago.' '.$daa.', would you like to hear the details?';
+                    }else{
+                        
+                        $utils->writeToLog("Tcount = ".$totalCount);
+                        $say = 'There are no reported shootings yesterday however, there were '.$totalCount.'reported shootings '.$x_ago.' '.$daa.', would you like to hear the details?';
+                        
+                    }
+                    
+                    
+                }else{
+                    
+                    $URL2 = 'https://phl.carto.com/api/v2/sql?q=SELECT%20COUNT%28date_%29%20FROM%20shootings%20WHERE%20dist%20%3D%20%27'.$districtNumber.'%27%20AND%20date_%3A%3Atext%20LIKE%20%27'.$pubDate.'%27';
+                    $utils->writeToLog("URL STUFF :".$URL2);
+                    $data_array2 = ShootingObject::getAPI_Info($URL2);
+                    $totalCount = $data_array2 = ['rows'][0]['count'];
+                    
+                    if($totalCount == 1){
+                        $say = 'There are no reported shootings in the '.$utils->addTH($districtNumber).' police district yesterday however, There is one reported shooting '.$x_ago.' '.$daa.', would you like to hear the details?';
+                        $utils->writeToLog("TOTAL CT : 1");
+                    }else{
+                        $utils->writeToLog("TOTAL CT X: ".$totalcount);
+                        $say = 'There are no reported shootings in the '.$utils->addTH($districtNumber).' police district, yesterday however, there were '.$totalCount.' reported shootings '.$x_ago.' '.$daa.', would you like to hear the details?';
+                        
+                    }
+                    
+                }
+                
+
+                
+                
+                }else{
+                    
+                    
+                    if($districtNumber == 0){
+                        
+                        if($totalCount == 1){
+                            $say = 'There is one reported shooting yesterday '.$daa.', would you like to hear the details?'; 
+                        }else{
+                            
+                            $say = 'In the '.$utils->addTH($districtNumber).' police district, there is one shooting to report, would you like to hear the details?'; 
+                        
+                        }
+                        
+                        
+                    }else{
+                        
+                        if($totalCount == 1){
+                            $say = 'There is one reported shooting yesterday in the'.$utils->addTH($districtNumber).'police district, would you like to hear the deatils?';
+                        }else{
+                            $say = 'In the '.$utils->addTH($districtNumber).' police district, there are '.$totalCount.' reported shootings yesterday, would you like to hear the details?';
+                            
+                        }
+                    }
+                    
+                    
+                    
+                
+                }
+            
+                
+                
+                $txt = array("version"=>"1.0","sessionAttributes"=>array("presentTime"=>"yesterday","shooting"=>"true","crimeType"=>"shootings","districtNumber"=>$districtNumber,"currentCount"=>1,"totalCount"=>$totalCount,"shootingDate"=>$pubDate),"response"=>array("outputSpeech"=>array("type"=>"SSML","ssml"=>'<speak>'.$say.'</speak>'),"reprompt"=>null,"shouldEndSession"=>false));
+                
+                return json_encode($txt);
             
             
             

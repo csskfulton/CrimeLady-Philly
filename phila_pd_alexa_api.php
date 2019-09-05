@@ -3,6 +3,7 @@
     require_once("objs/CrimeObject.php");
     require_once("objs/NewsObject.php");
     require_once("objs/ShootingObject.php");
+    require_once("objs/ErrorObject.php");
 
       
    
@@ -212,22 +213,92 @@
         $naviValue = $data['request']['intent']['slots']['navigation']['resolutions']['resolutionsPerAuthority'][0]['values'][0]['value']['name'];
         $naviCode = $data['request']['intent']['slots']['navigation']['resolutions']['resolutionsPerAuthority'][0]['status']['code'];
         $presentTimeCode = $data['request']['intent']['slots']['presentTime']['resolutions']['resolutionsPerAuthority'][0]['status']['code'];
-        $presenttimeValue = $data['request']['intent']['slots']['presentTime']['resolutions']['resolutionsPerAuthority'][0]['values'][0]['value']['name'];
+        $presentTimeValue = $data['request']['intent']['slots']['presentTime']['resolutions']['resolutionsPerAuthority'][0]['values'][0]['value']['name'];
         $districtNumberValue = $data['request']['intent']['slots']['districtNums']['resolutions']['resolutionsPerAuthority'][0]['values'][0]['value']['name'];
         $districtNumberCode = $data['request']['intent']['slots']['districtNums']['resolutions']['resolutionsPerAuthority'][0]['status']['code'];
         
         if($naviCode == "ER_SUCCESS_MATCH"){
             
+            $pre = $data['session']['attributes'];
+            $isDistrictNews = $pre['districtNews'];
+            $totalCount = $pre['totalCount'];
+            $currentCount = $pre['currentCount'];
+            $hash = $pre['Hash'];
+            $readCount = $pre['readCount'];
+            $districtNumber = $pre['districtNumber'];
+            $pubDate = $pre['pubDate'];
+            
             switch($naviValue){
-                case "next":
-                   //STUFF
-                    
-                    break;
-                    
+                
                 case "repeat":
                     //STUFF
+                    writeToLog("PLEASE REPEAT");
+                    
+                    if($isDistrictNews == true){
+                        $totalCount = $totalCount + 1;
+                        $readCount = $readCount - 1;
+                        if($districtNumber == 0){
+                            
+                            echo NewsObject::getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,$hash,$pubDate);
+                            
+                        }else{
+                            
+                            echo NewsObject::getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,0,$pubDate);
+                            
+                        }
+                        
+                    }else{
+                        
+                    }
+                    
+                    
                     
                     break;
+                
+                case "next":
+                   //STUFF
+                   writeToLog("NEXT PLEASE!");
+                   
+                    if($totalCount == 0){
+                        // NO MORE STORIES LEFT
+                        if($isDistrictNews == true){
+                            echo NewsObject::noMoreNewsStories();
+                        }else{
+                            echo NewsObject::noMoreNewsStories();
+                        }
+                        
+                        
+                    }else{
+                        //// FIX ME !!!!!
+                        writeToLog("NO DISTRICT BRO !");
+                        
+                        if(isDistrictNews == true){
+                            
+                            writeToLog("DISTRICT NEXT NEWS TRUE");
+                            
+                            if($districtNumber !== null){
+                                
+                                writeToLog("DISTRICT IS TRUE");
+                                
+                                
+                            }else{
+                                
+                                writeToLog("NO DISTRICT BRO !");
+                                echo NewsObject::getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,$hash,$pubDate);
+                            }
+                            
+                        }else{
+                            writeToLog("NOT NEWS !!!");
+                        }
+                        
+                    }
+                    
+                    
+                    
+                    
+                    
+                    break;
+                    
             }
             
         }else if($newsTypeCode == "ER_SUCCESS_MATCH"){
@@ -239,8 +310,12 @@
                     $news = new NewsObject();
                     if($districtNumberCode == "ER_SUCCESS_MATCH"){
                         echo $news->getLastDistrictNews($districtNumberValue);
+                        
                     }else if($districtNumberCode == "ER_SUCCESS_NO_MATCH"){
                         // WRONG DISTRICT PROVIDED
+                        $error = new ErrorObject();
+                        echo $error->wrongDistrict();
+                        
                     }else{
                         echo $news->getLastDistrictNews(0);
                     }
@@ -252,6 +327,32 @@
                     //STUFF
                     
                     break;
+            }
+            
+        }else if($presentTimeCode == "ER_SUCCESS_MATCH"){
+            writeToLog("PRESENT CODE HERE");
+            
+            switch($presentTimeValue){
+                
+                case "yesterday":
+                    
+                    writeToLog("HAPPEN YESTERDAY");
+                    $news = new NewsObject();
+                    
+                    if($districtNumberCode == "ER_SUCCESS_MATCH"){
+                        writeToLog("DISTRICT CODE MATCH");
+                        echo $news->getYesterdayNews($districtNumberValue);
+                    }else if($districtNumberCode == "ER_SUCCESS_NO_MATCH"){
+                        $error = new ErrorObject();
+                        echo $error->wrongDistrict();
+                    }else{
+                        writeToLog("JUST RUN FUNCTION");
+                        echo $news->getYesterdayNews(0);
+                    }
+                
+                break;
+                
+                
             }
             
         }
@@ -274,7 +375,7 @@
 
             
             
-            if($presentCode == "ER_SUCCESS_MATCH"){ 
+            if($presentCode == "ER_SUCCESS_MATCH"){
                 writeToLog("PRESENT CODE HERE");
                 
                 switch($presentValue){
@@ -302,6 +403,9 @@
                             
                             }else if($districtCode == "ER_SUCCESS_NO_MATCH"){
                                 /// WRONG DISTRICT PROVIDED
+                                $error = new ErrorObject();
+                                echo $error->wrongDistrict();
+                                
                             }else{
                                 
                                 writeToLog("NO DISTRICT PROVIDED");
@@ -317,6 +421,8 @@
                             
                         }else if($crimeCode == "ER_SUCCESS_NO_MATCH"){
                             // THE WRONG TYPE OF CRIME WAS PROVIDED
+                            $error = new ErrorObject();
+                            echo $error->wrongCrimeType();
                         }
                         
                         
@@ -326,24 +432,89 @@
                         
                         writeToLog("LAST HERE");
                         if($crimeCode == "ER_SUCCESS_MATCH"){
+                            
                             writeToLog("CRIMETYPE PROVIDED");
                             $crime = new CrimeObject();
-                            if($districtCode == "ER_SUCCESS_MATCH" ){
+                            $shoot = new ShootingObject();
+                            
+                            if($districtCode == "ER_SUCCESS_MATCH"){
                                 writeToLog("IS A CRIMETYPE");
-                                echo $crime->getLastCrime($crimeValue, $districtValue);
+                                
+                                if($crimeValue == "shootings"){
+                                    echo $shoot->getLastShooting($districtValue);
+                                }else{
+                                    echo $crime->getLastCrime($crimeValue, $districtValue);
+                                }
+                               
                             }else if($districtCode == "ER_SUCCESS_NO_MATCH"){
                                 /// WRONG DISTRICT PROVIDED
+                                $error = new ErrorObject();
+                                echo $error->wrongDistrict();
+                                
                             }else{
+                                
                                 writeToLog("NO DISTRICT PROVIDED");
-                                echo $crime->getLastCrime($crimeValue, "false");
+                                
+                                if($crimeValue == "shootings"){
+                                    echo $shoot->getLastShooting(0);
+                                }else{
+                                    echo $crime->getLastCrime($crimeValue, 0);
+                                }
+                                
                                 
                             }
                             
                         }else if($crimeCode == "ER_SUCCESS_NO_MATCH"){
                             // THE WRONG TYPE OF CRIME WAS PROVIDED
+                            $error = new ErrorObject();
+                            echo $error->wrongCrimeType();
                         }
                         
                         break;
+                        
+                    case "yesterday":
+                        
+                        if($crimeCode == "ER_SUCCESS_MATCH"){
+                            
+                            writeToLog("IS A CRIMETYPE YESTERDAY");
+                            
+                            if($districtCode == "ER_SUCCESS_MATCH"){
+                                writeToLog("DISTRICT HERE 99  YESTERDAY");
+                                if($crimeValue == "shootings"){
+                                    writeToLog("ITS A SHOOTING! YESTERDAY");
+                                    //echo ShootingObject::getTodayShootings($districtValue);
+                                }else{
+                                    writeToLog("ITS A CRIME YESTERDAY");
+                                   // echo CrimeObject::getCrimeToday($crimeValue,$districtValue);
+                                    
+                                }
+                                
+                                // HAS A DISTRICT
+                            }else if($districtCode == "ER_SUCCESS_NO_MATCH"){
+                                // WRONG DISTRICT PROVIDED
+                                writeToLog("ERROR NO DISTRICT EXIST YESTERDAY");
+                                echo ErrorObject::wrongDistrict();
+                                
+                            }else{
+                                // NO DISTRICT
+                                writeToLog("NO DISTRICT PROVIDED YESTERDAY");
+                                if($crimeValue == "shootings"){
+                                    writeToLog("ITS A SHOOTING! YESTERDAY");
+                                    
+                                    echo ShootingObject::getYesterdayShooting(0);
+                                }else{
+                                    echo CrimeObject::getCrimeToday($crimeValue, 0);
+                                    
+                                }
+                            }
+                            
+                        }else{
+                            
+                        }
+                    
+                    
+                    break;
+                        
                     
                 }
                 
@@ -369,15 +540,32 @@
                 case "yes":
                     
                     // FETCH ANOTHER STORY 
-                    if($hash !== null && $districtNews == true){
-                        
-                        $news = new NewsObject();
+                    if($districtNews == true){
                         $totalCount = $data['session']['attributes']["totalCount"];
-                        $currentCount = $data['session']['attributes']["currentCount"];
-                        $readCount = $data['session']['attributes']["readCount"];
-                        echo $news->getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,$hash);
+                        
+                        if($totalCount == 0){
+                            echo NewsObject::noMoreNewsStories();
                             
-  
+                        }else{
+                            
+                            $news = new NewsObject();
+                            $totalCount = $data['session']['attributes']["totalCount"];
+                            $currentCount = $data['session']['attributes']["currentCount"];
+                            $readCount = $data['session']['attributes']["readCount"];
+                            $pubDate = $data['session']['attributes']["pubDate"];
+                            
+                            if($hash !== null){
+                                
+                                echo $news->getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,$hash,0);
+                                
+                            }else{
+                                
+                                echo $news->getAnotherStory($districtNumber,$totalCount,$currentCount,$readCount,0,$pubDate);
+                                
+                            }
+                            
+                        }
+
                     }
                     
                     //FETCH ANOTHER CRIME INCIDENT
@@ -393,6 +581,7 @@
                             echo $shoot->getAnotherShooting($districtNumber,$shootingDate,$totalCount,$currentCount);
                             
                         }else{
+                            
                             // WHERE THERE ANY (CRIMES TODAY)
                             $currentCount = $attArray['currentCount'];
                             $totalCount = $attArray['totalCount'];
@@ -401,8 +590,14 @@
                             $dDate = $attArray['dDate'];
                             $readCount = $attArray['readCount'];
                             
-                            $crimes = new CrimeObject();
-                            echo $crimes->getMoreCrimes($districtNum,$dDate,$category,$totalCount,$currentCount,$presentTime,$crimeType,$readCount);
+                            if($totalCount == 0){
+                                echo CrimeObject::noMoreCrimes();
+                                
+                            }else{
+                                echo CrimeObject::getMoreCrimes($districtNum,$dDate,$category,$totalCount,$currentCount,$presentTime,$crimeType,$readCount);
+                                
+                            }
+                            
                             
                             
                         }
